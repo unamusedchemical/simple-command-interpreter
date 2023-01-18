@@ -1,20 +1,24 @@
 #include "tokenizer.h"
 #include <stdlib.h>
+#include <err.h>
+#include <string.h>
+#include <stdio.h>
 
 uint32_t countTokens(char* line) {
     uint32_t count = 0;
     for (int i = 0; i < strlen(line); ++i) {
-        if (line[i] == " ") {
+        if (line[i] == ' ') {
             count++;
         }
     }
-    return count;
+
+    return ++count;
 }
 
 void getTokenSizes(char* line, uint32_t* tokenSizes) {
     int tokenIndex = 0;
     for (int i = 0; i < strlen(line); i++) {
-        if (line[i] == 0) {
+        if (line[i] == ' ') {
             tokenIndex++;
         } else {
             tokenSizes[tokenIndex]++;
@@ -34,31 +38,33 @@ char** tokenizer(char* line) {
     }
     getTokenSizes(line, sizes);
 
-    char** tokens = malloc(sizeof(char*) * count + 1);
+    char** tokens = malloc(sizeof(char*) * (count + 1));
     if (tokens == NULL) {
         errx(20, "Error with malloc()");
     }
     tokens[count] = NULL;
     for (int i = 0; i < count; i++) {
-        tokens[i] = malloc(sizeof(char) * sizes[i] + 1);
+        tokens[i] = malloc(sizeof(char) * (sizes[i] + 1));
         if (tokens[i] == NULL) {
             for (int j = 0; j < i; j++) {
                 free(tokens[j]);
             }
             free(tokens);
+            errx(20, "Error with malloc()");
         }
     }
 
     int tokenIndex = 0;
-    for (int i = 0; i < strlen(line); ++i) {
-        if (line[i] == " ") {
-            tokens[tokenIndex] = '\0';
+    int tokenCharIndex;
+    for (tokenCharIndex = 0; tokenCharIndex < strlen(line); ++tokenCharIndex) {
+        if (line[tokenCharIndex] == ' ' || line[tokenCharIndex] == '\n') {
+            tokens[tokenIndex][tokenCharIndex] = '\0';
             tokenIndex++;
         } else {
-            tokens[tokenIndex] = line[i];
+            tokens[tokenIndex][tokenCharIndex] = line[tokenCharIndex];
         }
     }
-    tokens[tokenIndex] = '\0';
+    tokens[tokenIndex][tokenCharIndex] = '\0';
 
     free(sizes);
 
@@ -66,9 +72,10 @@ char** tokenizer(char* line) {
 }
 
 void freeTokens(char** tokens) {
-    char* token = *tokens;
-    while (token++ != NULL) {
-        free(token);
+    char** tokensCopy = tokens;
+    while(*tokensCopy != NULL) {
+        free(*tokensCopy);
+        tokensCopy++;
     }
     free(tokens);
 }
