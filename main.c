@@ -55,9 +55,7 @@ char* readline(int fd) {
 int main(int argc, char* argv[]) {
     if (argc == 1) {
         errx(40, "No arguments provided!");
-    }
-
-    if (argc != 2) {
+    } else if (argc != 2) {
         errx(41, "Too many arguments provided!");
     }
 
@@ -76,21 +74,26 @@ int main(int argc, char* argv[]) {
 
         pid_t childPid = fork();
         if (-1 == childPid) {
+            freeTokens(tokens);
             errx(30, "Problem with fork()");
         }
         printf("%d", childPid);
         if (0 == childPid) {
             if (-1 == execvp(tokens[0], tokens+1)) {
+                freeTokens(tokens);
                 errx(31, "Problem with execvp()");
             }
         } else {
             int status;
             if (-1 == wait(&status)) {
+                freeTokens(tokens);
                 errx(32, "Problem with wait()");
             }
 
             if (WIFEXITED(status)) {
                 printf("Child exited with status %d", WEXITSTATUS(status));
+            } else {
+                printf("Child exited abnormally");
             }
         }
 
