@@ -77,9 +77,8 @@ int main(int argc, char* argv[]) {
             freeTokens(tokens);
             errx(30, "Problem with fork()");
         }
-        printf("%d", childPid);
         if (0 == childPid) {
-            if (-1 == execvp(tokens[0], tokens+1)) {
+            if (-1 == execvp(tokens[0], tokens)) {
                 freeTokens(tokens);
                 errx(31, "Problem with execvp()");
             }
@@ -91,7 +90,7 @@ int main(int argc, char* argv[]) {
             }
 
             if (WIFEXITED(status)) {
-                printf("Child exited with status %d", WEXITSTATUS(status));
+                printf("Child exited with status %d\n", WEXITSTATUS(status));
             } else {
                 printf("Child exited abnormally");
             }

@@ -55,13 +55,14 @@ char** tokenizer(char* line) {
     }
 
     int tokenIndex = 0;
-    int tokenCharIndex;
-    for (tokenCharIndex = 0; tokenCharIndex < strlen(line); ++tokenCharIndex) {
-        if (line[tokenCharIndex] == ' ' || line[tokenCharIndex] == '\n') {
+    int tokenCharIndex = 0;
+    for (int i = 0; i < strlen(line); ++i) {
+        if (line[i] == ' ') {
             tokens[tokenIndex][tokenCharIndex] = '\0';
             tokenIndex++;
+            tokenCharIndex = 0;
         } else {
-            tokens[tokenIndex][tokenCharIndex] = line[tokenCharIndex];
+            tokens[tokenIndex][tokenCharIndex++] = line[i];
         }
     }
     tokens[tokenIndex][tokenCharIndex] = '\0';
@@ -78,4 +79,12 @@ void freeTokens(char** tokens) {
         tokensCopy++;
     }
     free(tokens);
+}
+
+void printTokens(char** tokens) {
+    char** tokensCopy = tokens;
+    while(*tokensCopy != NULL) {
+        printf("%s ", *tokensCopy);
+        tokensCopy++;
+    }
 }

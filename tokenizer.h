@@ -7,5 +7,6 @@ char** tokenizer(char*);
 uint32_t countTokens(char*);
 void getTokenSizes(char*, uint32_t*);
 void freeTokens(char**);
+void printTokens(char**);
 
 #endif
