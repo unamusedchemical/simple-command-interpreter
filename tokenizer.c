@@ -6,8 +6,9 @@
 
 uint32_t countTokens(char* line) {
     uint32_t count = 0;
-    for (int i = 0; i < strlen(line); ++i) {
-        if (line[i] == ' ') {
+    int len = strlen(line);
+    for (int i = 0; i < len; ++i) {
+        if (line[i] == ' ' && ((i + 1) < len && line[i + 1] != ' ')) {
             count++;
         }
     }
@@ -17,15 +18,20 @@ uint32_t countTokens(char* line) {
 
 void getTokenSizes(char* line, uint32_t* tokenSizes) {
     int tokenIndex = 0;
-    for (int i = 0; i < strlen(line); i++) {
+    int len = strlen(line);
+    for (int i = 0; i < len; i++) {
         if (line[i] == ' ') {
-            tokenIndex++;
+            if ((i + 1) < len && line[i + 1] != ' ') {
+                tokenIndex++;
+            }
         } else {
             tokenSizes[tokenIndex]++;
         }
     }
 }
 
+// if something fails in this function, it will return NULL
+// this is checked in main.c, and if it is NULL, the program exits with a code of 20
 char** tokenizer(char* line) {
     if (line == NULL) {
         return NULL;
@@ -34,13 +40,14 @@ char** tokenizer(char* line) {
     uint32_t count = countTokens(line);
     uint32_t* sizes = calloc(count, sizeof(int));
     if (sizes == NULL) {
-        errx(21, "Error with calloc()");
+        return NULL;
     }
     getTokenSizes(line, sizes);
 
     char** tokens = malloc(sizeof(char*) * (count + 1));
     if (tokens == NULL) {
-        errx(20, "Error with malloc()");
+        free(sizes);
+        return NULL;
     }
     tokens[count] = NULL;
     for (int i = 0; i < count; i++) {
@@ -50,25 +57,29 @@ char** tokenizer(char* line) {
                 free(tokens[j]);
             }
             free(tokens);
-            errx(20, "Error with malloc()");
+            free(sizes);
+            return NULL;
         }
     }
 
+    free(sizes);
+
     int tokenIndex = 0;
     int tokenCharIndex = 0;
-    for (int i = 0; i < strlen(line); ++i) {
+    int len = strlen(line);
+    for (int i = 0; i < len; ++i) {
         if (line[i] == ' ') {
-            tokens[tokenIndex][tokenCharIndex] = '\0';
-            tokenIndex++;
-            tokenCharIndex = 0;
+            if ((i + 1) < len && line[i + 1] != ' ') {
+                tokens[tokenIndex][tokenCharIndex] = '\0';
+                tokenIndex++;
+                tokenCharIndex = 0;
+            }
         } else {
             tokens[tokenIndex][tokenCharIndex++] = line[i];
         }
     }
     tokens[tokenIndex][tokenCharIndex] = '\0';
-
-    free(sizes);
-
+    
     return tokens;
 }
 
