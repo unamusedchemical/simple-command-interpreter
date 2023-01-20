@@ -81,7 +81,9 @@ int main(int argc, char* argv[]) {
             close(fd);
             errx(20, "Tokenisation failed!");
         }
-
+        printf("\n\n");
+        printTokens(tokens);
+        printf("\n");
         pid_t childPid = fork();
         if (-1 == childPid) {
             freeTokens(tokens);
