@@ -11,4 +11,5 @@ clean:
 	rm -f *.o
 
 run:
-	./commandInterpreter test
+# test is the name of the file that contains the commands
+	./commandInterpreter test 
